@@ -172,7 +172,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Info Banner ──────────────────────────────────────────────────────
+          //Info Banner
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -207,7 +207,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
           ),
           const SizedBox(height: 10),
 
-          // ── All months toggle ─────────────────────────────────────────────────
+          //All months toggle
           _OptionTile(
             icon: Icons.calendar_view_month,
             title: 'All Months',
@@ -225,7 +225,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
             onTap: () => setState(() => _exportAllMonths = false),
           ),
 
-          // ── Month dropdown ────────────────────────────────────────────────────
+          //Month dropdown
           if (!_exportAllMonths) ...[
             const SizedBox(height: 16),
             Container(
@@ -256,7 +256,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
 
           const SizedBox(height: 28),
 
-          // ── What's included ───────────────────────────────────────────────────
+          //What's included
           const Text(
             'WHAT\'S INCLUDED IN EXPORT',
             style: TextStyle(
@@ -277,7 +277,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
 
           const SizedBox(height: 32),
 
-          // ── Export Button ─────────────────────────────────────────────────────
+          //Export Button
           SizedBox(
             width: double.infinity,
             height: 52,
@@ -332,7 +332,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Info Banner ──────────────────────────────────────────────────────
+          //Info Banner
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -358,7 +358,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
 
           const SizedBox(height: 28),
 
-          // ── Steps ────────────────────────────────────────────────────────────
+          //Steps
           const Text(
             'HOW TO IMPORT',
             style: TextStyle(
@@ -375,7 +375,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
 
           const SizedBox(height: 32),
 
-          // ── Import Button ─────────────────────────────────────────────────────
+          //Import Button
           SizedBox(
             width: double.infinity,
             height: 52,
@@ -441,7 +441,7 @@ class _ExportImportScreenState extends ConsumerState<ExportImportScreen>
   ];
 }
 
-// ─── Helper Widgets ────────────────────────────────────────────────────────────
+//Helper Widgets
 
 class _OptionTile extends StatelessWidget {
   final IconData icon;

@@ -12,7 +12,7 @@ class AuthGate extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
  
     return authState.when(
-      // ── Still loading Firebase auth ──────────────────────────────────────
+      //Still loading Firebase auth
       loading: () => const Scaffold(
         backgroundColor: Color(0xFF0A0A0A),
         body: Center(
@@ -20,7 +20,7 @@ class AuthGate extends ConsumerWidget {
         ),
       ),
  
-      // ── Firebase error ───────────────────────────────────────────────────
+      //Firebase error
       error: (e, _) => Scaffold(
         backgroundColor: const Color(0xFF0A0A0A),
         body: Center(
@@ -29,12 +29,12 @@ class AuthGate extends ConsumerWidget {
         ),
       ),
  
-      // ── Auth resolved ────────────────────────────────────────────────────
+      //Auth resolved
       data: (user) {
         if (user == null) {
-          return const LoginScreen();   // not signed in
+          return const LoginScreen();
         }
-        return const LockScreen();     // signed in → biometric gate → home
+        return const LockScreen();
       },
     );
   }
