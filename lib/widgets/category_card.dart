@@ -19,10 +19,10 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final remaining = category.budget - spent;
-    final isOverBudget = remaining < 0;
-    final progress = (spent / category.budget).clamp(0.0, 1.0);
-    final progressColor = isOverBudget
+    final remaining   = category.budget - spent;
+    final isOver      = remaining < 0;
+    final progress    = (spent / category.budget).clamp(0.0, 1.0);
+    final progressColor = isOver
         ? AppTheme.accentRed
         : progress > 0.8
             ? AppTheme.accentAmber
@@ -32,28 +32,33 @@ class CategoryCard extends StatelessWidget {
       margin: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: AppTheme.cardBg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border(
-          left: BorderSide(color: AppTheme.primary, width: 4),
-        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header row ─────────────────────────────────────────────────
+            // ── Header ──────────────────────────────────────────────────
             Row(
               children: [
-                // Category icon
                 Container(
-                  padding: const EdgeInsets.all(5),
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(6),
+                    gradient: AppTheme.cardGradient,
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.category_outlined,
-                      color: AppTheme.primaryLight, size: 14),
+                      color: Colors.white, size: 16),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -66,37 +71,32 @@ class CategoryCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // Actions
                 GestureDetector(
-                    onTap: onEdit,
-                    child: const Icon(Icons.edit_outlined,
-                        color: AppTheme.textMuted, size: 15)),
-                const SizedBox(width: 8),
+                  onTap: onEdit,
+                  child: const Icon(Icons.edit_outlined,
+                      color: AppTheme.textMuted, size: 14),
+                ),
+                const SizedBox(width: 6),
                 GestureDetector(
-                    onTap: onDelete,
-                    child: const Icon(Icons.delete_outline,
-                        color: AppTheme.textMuted, size: 15)),
+                  onTap: onDelete,
+                  child: const Icon(Icons.delete_outline,
+                      color: AppTheme.textMuted, size: 14),
+                ),
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
-            // ── Budget row ─────────────────────────────────────────────────
+            // ── Amounts ──────────────────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _InfoChip(
-                  label: 'Budget',
-                  value: '₹${_fmt(category.budget)}',
-                  color: AppTheme.textSecondary,
-                ),
-                _InfoChip(
-                  label: 'Spent',
-                  value: '₹${_fmt(spent)}',
-                  color: AppTheme.primaryLight,
-                ),
-                _InfoChip(
-                  label: isOverBudget ? 'Over' : 'Left',
+                _Stat(label: 'Budget', value: '₹${_fmt(category.budget)}',
+                    color: AppTheme.textSecondary),
+                _Stat(label: 'Spent', value: '₹${_fmt(spent)}',
+                    color: AppTheme.primaryLight),
+                _Stat(
+                  label: isOver ? 'Over' : 'Left',
                   value: '₹${_fmt(remaining.abs())}',
                   color: progressColor,
                 ),
@@ -105,14 +105,15 @@ class CategoryCard extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // ── Progress bar ───────────────────────────────────────────────
+            // ── Progress bar ─────────────────────────────────────────────
             ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
                 value: progress,
-                minHeight: 5,
+                minHeight: 6,
                 backgroundColor: AppTheme.borderColor,
-                valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(progressColor),
               ),
             ),
           ],
@@ -121,23 +122,18 @@ class CategoryCard extends StatelessWidget {
     );
   }
 
-  String _fmt(double val) {
-    if (val >= 100000) return '${(val / 100000).toStringAsFixed(1)}L';
-    if (val >= 1000)   return '${(val / 1000).toStringAsFixed(1)}K';
-    return val.toStringAsFixed(0);
+  String _fmt(double v) {
+    if (v >= 100000) return '${(v / 100000).toStringAsFixed(1)}L';
+    if (v >= 1000)   return '${(v / 1000).toStringAsFixed(1)}K';
+    return v.toStringAsFixed(0);
   }
 }
 
-class _InfoChip extends StatelessWidget {
+class _Stat extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-
-  const _InfoChip({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const _Stat({required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -146,14 +142,10 @@ class _InfoChip extends StatelessWidget {
       children: [
         Text(label,
             style: const TextStyle(
-                color: AppTheme.textMuted,
-                fontSize: 9,
-                letterSpacing: 0.5)),
+                color: AppTheme.textMuted, fontSize: 9, letterSpacing: 0.5)),
         Text(value,
             style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w700)),
+                color: color, fontSize: 12, fontWeight: FontWeight.w700)),
       ],
     );
   }

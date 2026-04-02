@@ -1,6 +1,4 @@
-// lib/models/category_model.dart
 import 'package:hive/hive.dart';
-
 part 'category_model.g.dart';
 
 @HiveType(typeId: 0)
@@ -18,7 +16,7 @@ class CategoryModel extends HiveObject {
   int colorValue;
 
   @HiveField(4)
-  String monthKey; // Format: "MM-YYYY"
+  String monthKey;
 
   CategoryModel({
     required this.id,

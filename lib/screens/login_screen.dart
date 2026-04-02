@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import '../services/app_theme.dart';
 import '../services/auth_service.dart';
 import '../services/snackbar_service.dart';
-import 'lock_screen.dart';
- 
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
- 
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
- 
+
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
- 
+
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
     try {
@@ -21,7 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackbarService.show(context, 'Sign-in cancelled.',
             type: SnackType.warning);
       }
-      // On success, authStateProvider fires and AuthGate navigates automatically
     } catch (e) {
       if (mounted) {
         SnackbarService.show(context, 'Sign-in failed. Please try again.',
@@ -31,139 +30,189 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
- 
-              // ── Logo / Icon ─────────────────────────────────────────────
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6A0DAD).withOpacity(0.15),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: const Color(0xFF6A0DAD), width: 1.5),
+      backgroundColor: AppTheme.bgColor,
+      body: Stack(
+        children: [
+          // ── Background gradient blob ────────────────────────────────────
+          Positioned(
+            top: -80,
+            left: -60,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppTheme.primary.withOpacity(0.3),
+                    Colors.transparent,
+                  ],
                 ),
-                child: const Icon(Icons.account_balance_wallet_outlined,
-                    color: Color(0xFF6A0DAD), size: 44),
               ),
- 
-              const SizedBox(height: 24),
- 
-              // ── Title ───────────────────────────────────────────────────
-              const Text(
-                'Budget Tracker',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold),
+            ),
+          ),
+          Positioned(
+            bottom: -60,
+            right: -80,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppTheme.accentBlue.withOpacity(0.2),
+                    Colors.transparent,
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Track your spending.\nStay in control.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 15,
-                    height: 1.5),
-              ),
- 
-              const Spacer(flex: 2),
- 
-              // ── Features list ───────────────────────────────────────────
-              ...[
-                ('📊', 'Monthly budget planning'),
-                ('💳', 'Credit card tracking'),
-                ('☁️', 'Sync across all your devices'),
-                ('🔒', 'Your data, completely private'),
-              ].map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      children: [
-                        Text(item.$1, style: const TextStyle(fontSize: 18)),
-                        const SizedBox(width: 12),
-                        Text(item.$2,
-                            style: const TextStyle(
-                                color: Colors.white70, fontSize: 14)),
+            ),
+          ),
+
+          // ── Content ──────────────────────────────────────────────────────
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 28),
+              child: Column(
+                children: [
+                  const Spacer(flex: 2),
+
+                  // Logo
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.cardGradient,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primary.withOpacity(0.5),
+                          blurRadius: 24,
+                          offset: const Offset(0, 8),
+                        ),
                       ],
                     ),
-                  )),
- 
-              const Spacer(flex: 1),
- 
-              // ── Google Sign-In Button ───────────────────────────────────
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _signInWithGoogle,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black87,
-                    disabledBackgroundColor: Colors.white24,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
+                    child: const Icon(
+                        Icons.account_balance_wallet_outlined,
+                        color: Colors.white,
+                        size: 38),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: Color(0xFF6A0DAD)),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+
+                  const SizedBox(height: 28),
+
+                  const Text('Budget Tracker',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5)),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Track your spending.\nStay in control.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 15,
+                        height: 1.5),
+                  ),
+
+                  const Spacer(flex: 2),
+
+                  // Feature list
+                  ...[
+                    (Icons.pie_chart_outline,    'Monthly budget planning'),
+                    (Icons.credit_card_outlined, 'Credit card tracking'),
+                    (Icons.cloud_outlined,       'Sync across all devices'),
+                    (Icons.lock_outline,         'Your data, completely private'),
+                  ].map((item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: Row(
                           children: [
-                            // Google G logo
                             Container(
-                              width: 22,
-                              height: 22,
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle),
-                              child: const Text(
-                                'G',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF4285F4)),
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: AppTheme.primary.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                    color: AppTheme.primary.withOpacity(0.3)),
                               ),
+                              child: Icon(item.$1,
+                                  color: AppTheme.primaryLight, size: 18),
                             ),
-                            const SizedBox(width: 10),
-                            const Text(
-                              'Continue with Google',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87),
-                            ),
+                            const SizedBox(width: 14),
+                            Text(item.$2,
+                                style: const TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: 14)),
                           ],
                         ),
-                ),
+                      )),
+
+                  const Spacer(),
+
+                  // Google Sign-In button
+                  GestureDetector(
+                    onTap: _isLoading ? null : _signInWithGoogle,
+                    child: Container(
+                      width: double.infinity,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: AppTheme.primary),
+                              )
+                            : const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('G',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF4285F4))),
+                                  SizedBox(width: 12),
+                                  Text('Continue with Google',
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Your data is stored securely in Firebase.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
+                  ),
+                  const SizedBox(height: 32),
+                ],
               ),
- 
-              const SizedBox(height: 16),
-              const Text(
-                'By continuing, you agree to our Terms of Service.\nYour data is stored securely in Firebase.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white30, fontSize: 11),
-              ),
- 
-              const SizedBox(height: 32),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
