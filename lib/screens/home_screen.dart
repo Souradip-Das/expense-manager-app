@@ -630,21 +630,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Refresh FAB
-          FloatingActionButton.small(
-            heroTag: 'refresh',
-            onPressed: _isLoadingData ? null : _loadData,
-            backgroundColor: AppTheme.cardBgAlt,
-            tooltip: 'Refresh',
-            child: _isLoadingData
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                        color: AppTheme.primaryLight, strokeWidth: 2),
-                  )
-                : const Icon(Icons.refresh,
-                    color: AppTheme.primaryLight, size: 20),
-          ),
+          // FloatingActionButton.small(
+          //   heroTag: 'refresh',
+          //   onPressed: _isLoadingData ? null : _loadData,
+          //   backgroundColor: AppTheme.cardBgAlt,
+          //   tooltip: 'Refresh',
+          //   child: _isLoadingData
+          //       ? const SizedBox(
+          //           width: 18,
+          //           height: 18,
+          //           child: CircularProgressIndicator(
+          //               color: AppTheme.primaryLight, strokeWidth: 2),
+          //         )
+          //       : const Icon(Icons.refresh,
+          //           color: AppTheme.primaryLight, size: 20),
+          // ),
           const SizedBox(height: 10),
           // Add Expense FAB
           Container(
