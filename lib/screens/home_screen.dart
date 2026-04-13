@@ -1,3 +1,4 @@
+// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -184,6 +185,67 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         );
       }
     }
+  }
+
+  // ─── Confirm delete dialog ──────────────────────────────────────────────────
+  Future<bool> _confirmDelete({
+    required String title,
+    required String subtitle,
+  }) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppTheme.cardBg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.accentRed.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.delete_outline,
+                  color: AppTheme.accentRed, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(title,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600)),
+            ),
+          ],
+        ),
+        content: Text(subtitle,
+            style: const TextStyle(
+                color: AppTheme.textSecondary, fontSize: 14, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel',
+                style: TextStyle(color: AppTheme.textMuted)),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: AppTheme.accentRed.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                  color: AppTheme.accentRed.withOpacity(0.5)),
+            ),
+            child: TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete',
+                  style: TextStyle(
+                      color: AppTheme.accentRed,
+                      fontWeight: FontWeight.w600)),
+            ),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   @override
@@ -413,14 +475,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       AddCategoryDialog(monthKey: _monthKey),
                 ),
                 onRemove: categories.isNotEmpty
-                    ? () {
+                    ? () async {
                         final last = categories.last;
-                        ref
-                            .read(categoriesProvider.notifier)
-                            .deleteCategory(last.id);
-                        SnackbarService.show(context,
-                            '"${last.name}" deleted.',
-                            type: SnackType.info);
+                        final ok = await _confirmDelete(
+                          title: 'Delete Category',
+                          subtitle:
+                              'Delete "${last.name}"? This will NOT delete existing transactions under this category.',
+                        );
+                        if (ok && mounted) {
+                          ref
+                              .read(categoriesProvider.notifier)
+                              .deleteCategory(last.id);
+                          SnackbarService.show(context,
+                              '"${last.name}" deleted.',
+                              type: SnackType.info);
+                        }
                       }
                     : null,
               ),
@@ -449,13 +518,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           builder: (_) => AddCategoryDialog(
                               monthKey: _monthKey, existing: cat),
                         ),
-                        onDelete: () {
-                          ref
-                              .read(categoriesProvider.notifier)
-                              .deleteCategory(cat.id);
-                          SnackbarService.show(context,
-                              '"${cat.name}" deleted.',
-                              type: SnackType.info);
+                        onDelete: () async {
+                          final ok = await _confirmDelete(
+                            title: 'Delete Category',
+                            subtitle:
+                                'Delete "${cat.name}"? This will NOT delete existing transactions under this category.',
+                          );
+                          if (ok && mounted) {
+                            ref
+                                .read(categoriesProvider.notifier)
+                                .deleteCategory(cat.id);
+                            SnackbarService.show(context,
+                                '"${cat.name}" deleted.',
+                                type: SnackType.info);
+                          }
                         },
                       );
                     },
@@ -495,13 +571,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 delegate: SliverChildBuilderDelegate(
                   (ctx, i) => CreditCardTile(
                     item: creditCards[i],
-                    onDelete: () {
-                      ref
-                          .read(creditCardsProvider.notifier)
-                          .deleteCreditCard(creditCards[i].id);
-                      SnackbarService.show(
-                          context, 'Entry deleted.',
-                          type: SnackType.info);
+                    onDelete: () async {
+                      final ok = await _confirmDelete(
+                        title: 'Delete Entry',
+                        subtitle:
+                            'Delete "${creditCards[i].title}" (₹${creditCards[i].amount.toStringAsFixed(0)})? This action cannot be undone.',
+                      );
+                      if (ok && mounted) {
+                        ref
+                            .read(creditCardsProvider.notifier)
+                            .deleteCreditCard(creditCards[i].id);
+                        SnackbarService.show(
+                            context, 'Entry deleted.',
+                            type: SnackType.info);
+                      }
                     },
                   ),
                   childCount: creditCards.length,
@@ -606,13 +689,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 delegate: SliverChildBuilderDelegate(
                   (ctx, i) => TransactionTile(
                     item: filteredTxs[i],
-                    onDelete: () {
-                      ref
-                          .read(transactionsProvider.notifier)
-                          .deleteTransaction(filteredTxs[i].id);
-                      SnackbarService.show(
-                          context, 'Transaction deleted.',
-                          type: SnackType.info);
+                    onDelete: () async {
+                      final ok = await _confirmDelete(
+                        title: 'Delete Transaction',
+                        subtitle:
+                            'Delete "${filteredTxs[i].description.isNotEmpty ? filteredTxs[i].description : filteredTxs[i].categoryName}" (₹${filteredTxs[i].amount.toStringAsFixed(0)})? This action cannot be undone.',
+                      );
+                      if (ok && mounted) {
+                        ref
+                            .read(transactionsProvider.notifier)
+                            .deleteTransaction(filteredTxs[i].id);
+                        SnackbarService.show(
+                            context, 'Transaction deleted.',
+                            type: SnackType.info);
+                      }
                     },
                   ),
                   childCount: filteredTxs.length,
@@ -630,21 +720,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Refresh FAB
-          // FloatingActionButton.small(
-          //   heroTag: 'refresh',
-          //   onPressed: _isLoadingData ? null : _loadData,
-          //   backgroundColor: AppTheme.cardBgAlt,
-          //   tooltip: 'Refresh',
-          //   child: _isLoadingData
-          //       ? const SizedBox(
-          //           width: 18,
-          //           height: 18,
-          //           child: CircularProgressIndicator(
-          //               color: AppTheme.primaryLight, strokeWidth: 2),
-          //         )
-          //       : const Icon(Icons.refresh,
-          //           color: AppTheme.primaryLight, size: 20),
-          // ),
+          FloatingActionButton.small(
+            heroTag: 'refresh',
+            onPressed: _isLoadingData ? null : _loadData,
+            backgroundColor: AppTheme.cardBgAlt,
+            tooltip: 'Refresh',
+            child: _isLoadingData
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                        color: AppTheme.primaryLight, strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh,
+                    color: AppTheme.primaryLight, size: 20),
+          ),
           const SizedBox(height: 10),
           // Add Expense FAB
           Container(
@@ -724,6 +814,7 @@ class _StatPill extends StatelessWidget {
     this.onTap,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -759,7 +850,9 @@ class _StatPill extends StatelessWidget {
               Text(
                 value,
                 style: TextStyle(
-                    color: isNegative ? const Color(0xFFFF8A80) : Colors.white,
+                    color: isNegative
+                        ? const Color(0xFFFF8A80)
+                        : Colors.white,
                     fontSize: 13,
                     fontWeight: FontWeight.bold),
               ),
@@ -798,7 +891,9 @@ class _EmptyState extends StatelessWidget {
             Text(message,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                    color: AppTheme.textMuted, fontSize: 13, height: 1.5)),
+                    color: AppTheme.textMuted,
+                    fontSize: 13,
+                    height: 1.5)),
           ],
         ),
       ),
